@@ -1,16 +1,14 @@
 package pl.task.personalities.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import pl.task.personalities.common.Identification;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -18,10 +16,10 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @Setter
-@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
-public abstract class Person implements Serializable {
+public abstract class Person implements Serializable, Identification {
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE)
     private Long id;
@@ -39,10 +37,20 @@ public abstract class Person implements Serializable {
     @NotBlank(message = "PESEL is required")
     private String pesel;
     @Min(value = 0, message = "Height must be a positive number")
-    private int height;
+    @NotNull(message = "Height is required")
+    private Integer height;
     @DecimalMin(value = "0.0", message = "Weight must be a positive number")
     private double weight;
     @Email(message = "Invalid email address")
     @NotBlank(message = "Email is required")
     private String emailAddress;
+
+    public Person(String firstName, String lastName, String pesel, int height, double weight, String emailAddress) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.pesel = pesel;
+        this.height = height;
+        this.weight = weight;
+        this.emailAddress = emailAddress;
+    }
 }

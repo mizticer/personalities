@@ -16,8 +16,8 @@ public class Pensioner extends Person {
     private double amountOfPension;
     @Positive(message = "Years worked must be a positive number")
     private int yearsWorked;
-
-    public Pensioner(double amountOfPension, int yearsWorked) {
+    public Pensioner(String firstName, String lastName, String pesel, Integer height, double weight, String emailAddress, double amountOfPension, int yearsWorked) {
+        super(firstName, lastName, pesel, height, weight, emailAddress);
         this.amountOfPension = amountOfPension;
         this.yearsWorked = yearsWorked;
     }

@@ -24,8 +24,9 @@ public class Employee extends Person {
     @DecimalMin(value = "0.0", message = "Current salary must be a positive number")
     private double salary;
 
-    public Employee(LocalDate employmentStartDate, String position, double salary) {
-        this.employmentStartDate = employmentStartDate;
+    public Employee(String firstName, String lastName, String pesel, int height, double weight, String emailAddress, LocalDate employmentStartDate, String position, double salary) {
+        super(firstName, lastName, pesel, height, weight, emailAddress);
+        this.employmentStartDate=employmentStartDate;
         this.position = position;
         this.salary = salary;
     }
