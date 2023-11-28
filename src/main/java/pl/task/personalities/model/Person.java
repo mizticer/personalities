@@ -21,7 +21,7 @@ import java.time.LocalDateTime;
 @EntityListeners(AuditingEntityListener.class)
 public abstract class Person implements Serializable, Identification {
     @Id
-    @GeneratedValue(strategy = GenerationType.TABLE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @CreatedDate
     private LocalDateTime createdAt;
@@ -29,28 +29,4 @@ public abstract class Person implements Serializable, Identification {
     private LocalDateTime updatedAt;
     @Version
     private int version;
-    @NotBlank(message = "First name is required")
-    private String firstName;
-    @NotBlank(message = "Last name is required")
-    private String lastName;
-    @Column(unique = true)
-    @NotBlank(message = "PESEL is required")
-    private String pesel;
-    @Min(value = 0, message = "Height must be a positive number")
-    @NotNull(message = "Height is required")
-    private Integer height;
-    @DecimalMin(value = "0.0", message = "Weight must be a positive number")
-    private double weight;
-    @Email(message = "Invalid email address")
-    @NotBlank(message = "Email is required")
-    private String emailAddress;
-
-    public Person(String firstName, String lastName, String pesel, int height, double weight, String emailAddress) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.pesel = pesel;
-        this.height = height;
-        this.weight = weight;
-        this.emailAddress = emailAddress;
-    }
 }

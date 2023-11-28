@@ -1,12 +1,13 @@
-package pl.task.personalities.model.response;
+package pl.task.personalities.model.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.Builder;
-import lombok.Value;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
-@Value
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class PensionerResponse implements PersonResponse {
     private Long id;
@@ -14,21 +15,15 @@ public class PensionerResponse implements PersonResponse {
     private LocalDateTime createdAt;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updatedAt;
-
     private int version;
-
     private String firstName;
-
     private String lastName;
-    //raczej zakryc
-    private String pesel;
-
-    private int height;
-
-    private double weight;
-
+    private String gender;
+    private Integer height;
+    private Double weight;
     private String emailAddress;
-    private double amountOfPension;
-    private int yearsWorked;
+    private Double amountOfPension;
+    private Integer yearsWorked;
+
 
 }

@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import pl.task.personalities.exceptions.ExceptionResponse;
 import pl.task.personalities.exceptions.InvalidRequestException;
+import pl.task.personalities.exceptions.ModificationException;
+import pl.task.personalities.exceptions.PositionDateException;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -53,5 +55,14 @@ public class GlobalExceptionHandler {
         ExceptionResponse response = new ExceptionResponse(List.of(e.getMessage()), "BAD_REQUEST", LocalDateTime.now());
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
-
+    @ExceptionHandler(PositionDateException.class)
+    public ResponseEntity<ExceptionResponse> handleMethodPositionDateException(PositionDateException e) {
+        ExceptionResponse response = new ExceptionResponse(List.of(e.getMessage()), "BAD_REQUEST", LocalDateTime.now());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+    @ExceptionHandler(ModificationException.class)
+    public ResponseEntity<ExceptionResponse> handleMethodPositionDateException(ModificationException e) {
+        ExceptionResponse response = new ExceptionResponse(List.of(e.getMessage()), "BAD_REQUEST", LocalDateTime.now());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
 }

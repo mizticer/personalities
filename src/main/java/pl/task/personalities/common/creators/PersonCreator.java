@@ -2,7 +2,7 @@ package pl.task.personalities.common.creators;
 
 import pl.task.personalities.exceptions.InvalidRequestException;
 import pl.task.personalities.model.Person;
-import pl.task.personalities.model.response.PersonResponse;
+import pl.task.personalities.model.dto.response.PersonResponse;
 
 import java.time.LocalDate;
 import java.util.Map;

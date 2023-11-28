@@ -1,33 +1,56 @@
 package pl.task.personalities.model;
 
-import jakarta.persistence.Entity;
-import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Past;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
 @Entity
 @NoArgsConstructor
 public class Employee extends Person {
-    @NotNull(message = "Employment start date is required")
-    @Past(message = "Employment start date must be in the past")
-    private LocalDate employmentStartDate;
-    @NotBlank(message = "Current position is required")
-    private String position;
-    @DecimalMin(value = "0.0", message = "Current salary must be a positive number")
-    private double salary;
+    @NotBlank(message = "First name is required")
+    private String firstName;
+    @NotBlank(message = "Last name is required")
+    private String lastName;
+    @Column(unique = true)
+    @NotBlank(message = "PESEL is required")
+    private String pesel;
+    @NotNull(message = "Gender is required")
+    private String gender;
+    @Min(value = 0, message = "Height must be a positive number")
+    @NotNull(message = "Height is required")
+    private Integer height;
+    @DecimalMin(value = "0.0", message = "Weight must be a positive number")
+    private Double weight;
+    @Email(message = "Invalid email address")
+    @NotBlank(message = "Email is required")
+    private String emailAddress;
 
-    public Employee(String firstName, String lastName, String pesel, int height, double weight, String emailAddress, LocalDate employmentStartDate, String position, double salary) {
-        super(firstName, lastName, pesel, height, weight, emailAddress);
-        this.employmentStartDate=employmentStartDate;
-        this.position = position;
-        this.salary = salary;
+    private LocalDate currentEmploymentStartDate;
+
+    private String currentPosition;
+
+    private Double currentSalary;
+    @OneToMany(mappedBy = "employee", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private List<Position> positions = new ArrayList<>();
+
+    public Employee(String firstName, String lastName, String pesel, String gender, Integer height, Double weight, String emailAddress) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.pesel = pesel;
+        this.gender = gender;
+        this.height = height;
+        this.weight = weight;
+        this.emailAddress = emailAddress;
     }
+
 }

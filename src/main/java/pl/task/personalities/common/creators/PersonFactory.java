@@ -3,9 +3,10 @@ package pl.task.personalities.common.creators;
 import org.springframework.stereotype.Service;
 import pl.task.personalities.exceptions.InvalidRequestException;
 import pl.task.personalities.model.Person;
-import pl.task.personalities.model.request.PersonRequest;
-import pl.task.personalities.model.response.PersonResponse;
+import pl.task.personalities.model.dto.request.PersonRequest;
+import pl.task.personalities.model.dto.response.PersonResponse;
 
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
@@ -30,6 +31,6 @@ public class PersonFactory {
     }
 
     public PersonResponse createResponse(Person person) {
-        return creators.get(person.getClass().getSimpleName()).createResponse(person);
+        return creators.get(person.getClass().getSimpleName().toUpperCase(Locale.ROOT)).createResponse(person);
     }
 }

@@ -5,8 +5,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import pl.task.personalities.model.Employee;
 import pl.task.personalities.model.Person;
-import pl.task.personalities.model.response.EmployeeResponse;
-import pl.task.personalities.model.response.PersonResponse;
+import pl.task.personalities.model.dto.response.EmployeeResponse;
+import pl.task.personalities.model.dto.response.PersonResponse;
 
 import java.util.Map;
 
@@ -17,16 +17,15 @@ public class EmployeeCreator implements PersonCreator {
 
     @Override
     public String getTypeOfPerson() {
-        return "Employee";
+        return "EMPLOYEE";
     }
 
     @Override
     public Person create(Map<String, Object> fields) {
-        return new Employee(getStringField(fields, "firstName"), getStringField(fields, "lastName"), getStringField(fields, "pesel"),
-                getIntegerField(fields, "height"), getDoubleField(fields, "weight"),
-                getStringField(fields, "emailAddress"), getDateField(fields, "employmentStartDate"), getStringField(fields, "position"),
-                getDoubleField(fields, "salary"));
+        return new Employee(getStringField(fields, "firstName"), getStringField(fields, "lastName"), getStringField(fields, "pesel"), getStringField(fields, "gender"),
+                getIntegerField(fields, "height"), getDoubleField(fields, "weight"), getStringField(fields, "emailAddress"));
     }
+
 
     @Override
     public PersonResponse createResponse(Person person) {

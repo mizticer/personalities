@@ -5,8 +5,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import pl.task.personalities.model.Pensioner;
 import pl.task.personalities.model.Person;
-import pl.task.personalities.model.response.PensionerResponse;
-import pl.task.personalities.model.response.PersonResponse;
+import pl.task.personalities.model.dto.response.PensionerResponse;
+import pl.task.personalities.model.dto.response.PersonResponse;
 
 import java.util.Map;
 
@@ -17,12 +17,12 @@ public class PensionerCreator implements PersonCreator {
 
     @Override
     public String getTypeOfPerson() {
-        return "Pensioner";
+        return "PENSIONER";
     }
 
     @Override
     public Person create(Map<String, Object> fields) {
-        return new Pensioner(getStringField(fields, "firstName"), getStringField(fields, "lastName"), getStringField(fields, "pesel"),
+        return new Pensioner(getStringField(fields, "firstName"), getStringField(fields, "lastName"), getStringField(fields, "pesel"),getStringField(fields, "gender"),
                 getIntegerField(fields, "height"), getDoubleField(fields, "weight"), getStringField(fields, "emailAddress"), getDoubleField(fields, "amountOfPension"), getIntegerField(fields, "yearsWorked"));
     }
 
