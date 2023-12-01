@@ -26,7 +26,6 @@ public class EmployeeCreator implements PersonCreator {
                 getIntegerField(fields, "height"), getDoubleField(fields, "weight"), getStringField(fields, "emailAddress"));
     }
 
-
     @Override
     public PersonResponse createResponse(Person person) {
         return mapper.map(person, EmployeeResponse.class);

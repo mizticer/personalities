@@ -1,6 +1,5 @@
 package pl.task.personalities.model;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
@@ -16,7 +15,7 @@ public class Pensioner extends Person {
     private String firstName;
     @NotBlank(message = "Last name is required")
     private String lastName;
-    @Column(unique = true)
+    // @Column(unique = true)
     @NotBlank(message = "PESEL is required")
     private String pesel;
     @NotNull(message = "Gender is required")
@@ -34,11 +33,11 @@ public class Pensioner extends Person {
     @Positive(message = "Years worked must be a positive number")
     private Integer yearsWorked;
 
-    public Pensioner(String firstName, String lastName, String pesel,String gender, Integer height, Double weight, String emailAddress, Double amountOfPension, Integer yearsWorked) {
+    public Pensioner(String firstName, String lastName, String pesel, String gender, Integer height, Double weight, String emailAddress, Double amountOfPension, Integer yearsWorked) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.pesel = pesel;
-        this.gender=gender;
+        this.gender = gender;
         this.height = height;
         this.weight = weight;
         this.emailAddress = emailAddress;

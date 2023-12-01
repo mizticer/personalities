@@ -1,9 +1,6 @@
 package pl.task.personalities.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
@@ -37,7 +34,7 @@ public class Position {
     private Double salary;
 
     public Position(String name, LocalDate startDate, LocalDate endDate, Double salary, Employee employee) {
-        this.employee=employee;
+        this.employee = employee;
         this.name = name;
         this.startDate = startDate;
         this.endDate = endDate;

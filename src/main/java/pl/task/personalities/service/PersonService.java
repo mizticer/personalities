@@ -1,17 +1,21 @@
 package pl.task.personalities.service;
 
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.LockModeType;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import pl.task.personalities.common.creators.PersonFactory;
 import pl.task.personalities.exceptions.EntityNotFoundException;
 import pl.task.personalities.exceptions.ModificationException;
+import pl.task.personalities.model.ImportProgress;
 import pl.task.personalities.model.Person;
 import pl.task.personalities.model.dto.request.PersonEditRequest;
 import pl.task.personalities.model.dto.request.PersonQuery;
@@ -19,16 +23,21 @@ import pl.task.personalities.model.dto.request.PersonRequest;
 import pl.task.personalities.model.dto.response.PersonResponse;
 import pl.task.personalities.repository.PersonRepository;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class PersonService extends GenericService<Person, PersonRepository> {
     private final PersonFactory personFactory;
+
     @PersistenceContext
     EntityManager entityManager;
 
@@ -170,7 +179,7 @@ public class PersonService extends GenericService<Person, PersonRepository> {
     @Transactional
     public PersonResponse edit(Long id, PersonEditRequest personEditRequest) throws NoSuchFieldException, IllegalAccessException {
         Person personToEdit = repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Person not found"));
-        if(personToEdit.getVersion()!=personEditRequest.getVersion()){
+        if (personToEdit.getVersion() != personEditRequest.getVersion()) {
             throw new ModificationException("Person has been modified by another transaction. Please refresh and try again.");
         }
         for (Map.Entry<String, Object> entry : personEditRequest.getUpdates().entrySet()) {
@@ -184,5 +193,52 @@ public class PersonService extends GenericService<Person, PersonRepository> {
         personToEdit.setUpdatedAt(LocalDateTime.now());
         PersonResponse editedPerson = personFactory.createResponse(repository.saveAndFlush(personToEdit));
         return editedPerson;
+    }
+
+    @Transactional
+    @Lock(value = LockModeType.PESSIMISTIC_WRITE)
+    public void processCsvFile(MultipartFile file, ImportProgress importProgress) throws IOException {
+        Stream<String> lines = new BufferedReader(new InputStreamReader(file.getInputStream())).lines();
+        lines.map(line -> line.split(","))
+                .forEach(args -> {
+                    PersonRequest personRequest = createPersonRequestFromCsv(args);
+                    addPerson(personRequest);
+                    importProgress.incrementProcessedRows();
+                });
+    }
+
+    private PersonRequest createPersonRequestFromCsv(String[] args) {
+        PersonRequest personRequest = new PersonRequest();
+        personRequest.setTypeOfPerson(args[0].toUpperCase());
+
+        Map<String, Object> fields = new HashMap<>();
+        fields.put("firstName", args[1]);
+        fields.put("lastName", args[2]);
+        fields.put("pesel", args[3]);
+        fields.put("gender", args[4]);
+        fields.put("height", Integer.parseInt(args[5]));
+        fields.put("weight", Double.parseDouble(args[6]));
+        fields.put("emailAddress", args[7]);
+
+        switch (personRequest.getTypeOfPerson()) {
+            case "EMPLOYEE":
+                break;
+            case "PENSIONER":
+                fields.put("amountOfPension", Double.parseDouble(args[8]));
+                fields.put("yearsWorked", Integer.parseInt(args[9]));
+                break;
+            case "STUDENT":
+                fields.put("universityName", args[8]);
+                fields.put("yearStudy", Integer.parseInt(args[9]));
+                fields.put("fieldOfStudy", args[10]);
+                fields.put("scholarshipAmount", Double.parseDouble(args[11]));
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid person type: " + personRequest.getTypeOfPerson());
+        }
+
+        personRequest.setFields(fields);
+
+        return personRequest;
     }
 }

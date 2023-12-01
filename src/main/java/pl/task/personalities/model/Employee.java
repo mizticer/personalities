@@ -21,7 +21,7 @@ public class Employee extends Person {
     @NotBlank(message = "Last name is required")
     private String lastName;
     @Column(unique = true)
-    @NotBlank(message = "PESEL is required")
+    //@NotBlank(message = "PESEL is required")
     private String pesel;
     @NotNull(message = "Gender is required")
     private String gender;
