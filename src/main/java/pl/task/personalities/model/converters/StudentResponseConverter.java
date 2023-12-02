@@ -16,7 +16,6 @@ public class StudentResponseConverter implements Converter<Student, StudentRespo
                 .version(student.getVersion())
                 .firstName(student.getFirstName())
                 .lastName(student.getLastName())
-                .gender(student.getGender())
                 .height(student.getHeight())
                 .weight(student.getWeight())
                 .emailAddress(student.getEmailAddress())

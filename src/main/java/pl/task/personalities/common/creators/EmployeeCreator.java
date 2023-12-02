@@ -22,7 +22,7 @@ public class EmployeeCreator implements PersonCreator {
 
     @Override
     public Person create(Map<String, Object> fields) {
-        return new Employee(getStringField(fields, "firstName"), getStringField(fields, "lastName"), getStringField(fields, "pesel"), getStringField(fields, "gender"),
+        return new Employee(getStringField(fields, "firstName"), getStringField(fields, "lastName"), getStringField(fields, "pesel"),
                 getIntegerField(fields, "height"), getDoubleField(fields, "weight"), getStringField(fields, "emailAddress"));
     }
 

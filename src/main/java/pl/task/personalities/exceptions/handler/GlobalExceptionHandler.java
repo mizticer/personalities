@@ -9,10 +9,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import pl.task.personalities.exceptions.ExceptionResponse;
-import pl.task.personalities.exceptions.InvalidRequestException;
-import pl.task.personalities.exceptions.ModificationException;
-import pl.task.personalities.exceptions.PositionDateException;
+import pl.task.personalities.exceptions.*;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -49,7 +46,11 @@ public class GlobalExceptionHandler {
         body.put("ERROR", errorMessage);
         return new ResponseEntity<>(body, new HttpHeaders(), HttpStatus.CONFLICT);
     }
-
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<ExceptionResponse> handleEntityNotFoundException(EntityNotFoundException e) {
+        ExceptionResponse response = new ExceptionResponse(List.of(e.getMessage()), "BAD_REQUEST", LocalDateTime.now());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
     @ExceptionHandler(InvalidRequestException.class)
     public ResponseEntity<ExceptionResponse> handleMethodArgumentNotValidException(InvalidRequestException e) {
         ExceptionResponse response = new ExceptionResponse(List.of(e.getMessage()), "BAD_REQUEST", LocalDateTime.now());

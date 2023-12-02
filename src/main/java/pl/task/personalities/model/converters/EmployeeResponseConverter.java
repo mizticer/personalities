@@ -16,7 +16,6 @@ public class EmployeeResponseConverter implements Converter<Employee, EmployeeRe
                 .version(employee.getVersion())
                 .firstName(employee.getFirstName())
                 .lastName(employee.getLastName())
-                .gender(employee.getGender())
                 .height(employee.getHeight())
                 .weight(employee.getWeight())
                 .emailAddress(employee.getEmailAddress())

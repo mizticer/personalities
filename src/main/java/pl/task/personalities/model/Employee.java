@@ -16,24 +16,6 @@ import java.util.List;
 @Entity
 @NoArgsConstructor
 public class Employee extends Person {
-    @NotBlank(message = "First name is required")
-    private String firstName;
-    @NotBlank(message = "Last name is required")
-    private String lastName;
-    @Column(unique = true)
-    @NotBlank(message = "PESEL is required")
-    @Size(min = 11, max = 11, message = "PESEL must be exactly 11 characters long")
-    @Pattern(regexp = "\\d+", message = "PESEL must consist only of digits")
-    private String pesel;
-    @NotBlank(message = "Gender is required")
-    private String gender;
-    @Min(value = 0, message = "Height must be a positive number")
-    private Integer height;
-    @DecimalMin(value = "0.0", message = "Weight must be a positive number")
-    private Double weight;
-    @Email(message = "Invalid email address")
-    @NotBlank(message = "Email is required")
-    private String emailAddress;
     private LocalDate currentEmploymentStartDate;
     private String currentPosition;
     @PositiveOrZero(message = "Salary must be a non-negative number")
@@ -42,14 +24,8 @@ public class Employee extends Person {
     @JsonManagedReference
     private List<Position> positions = new ArrayList<>();
 
-    public Employee(String firstName, String lastName, String pesel, String gender, Integer height, Double weight, String emailAddress) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.pesel = pesel;
-        this.gender = gender;
-        this.height = height;
-        this.weight = weight;
-        this.emailAddress = emailAddress;
+    public Employee(String firstName, String lastName, String pesel, Integer height, Double weight, String emailAddress) {
+        super(firstName, lastName, pesel, height, weight, emailAddress);
     }
 
 }

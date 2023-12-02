@@ -16,7 +16,6 @@ public class PensionerResponseConverter implements Converter<Pensioner, Pensione
                 .version(pensioner.getVersion())
                 .firstName(pensioner.getFirstName())
                 .lastName(pensioner.getLastName())
-                .gender(pensioner.getGender())
                 .height(pensioner.getHeight())
                 .weight(pensioner.getWeight())
                 .emailAddress(pensioner.getEmailAddress())

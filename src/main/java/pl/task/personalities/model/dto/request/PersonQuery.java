@@ -13,14 +13,15 @@ public class PersonQuery {
     private String type;
     private String firstName;
     private String lastName;
-    private Integer ageFrom;
-    private Integer ageTo;
+    private Integer age;
     private String pesel;
     private String gender;
     private Integer heightFrom;
     private Integer heightTo;
+    private Integer height;
     private Double weightFrom;
     private Double weightTo;
+    private Double weight;
     private String emailAddress;
     private Double salaryFrom;
     private Double salaryTo;

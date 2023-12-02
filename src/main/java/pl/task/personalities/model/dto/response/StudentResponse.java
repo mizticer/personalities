@@ -17,7 +17,6 @@ public class StudentResponse implements PersonResponse {
     private int version;
     private String firstName;
     private String lastName;
-    private String gender;
     private Integer height;
     private Double weight;
     private String emailAddress;

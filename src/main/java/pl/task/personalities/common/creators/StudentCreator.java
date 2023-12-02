@@ -23,7 +23,7 @@ public class StudentCreator implements PersonCreator {
     @Override
     public Person create(Map<String, Object> fields) {
         return new Student(getStringField(fields, "firstName"), getStringField(fields, "lastName"), getStringField(fields, "pesel"),
-                getStringField(fields, "gender"), getIntegerField(fields, "height"), getDoubleField(fields, "weight"),
+                getIntegerField(fields, "height"), getDoubleField(fields, "weight"),
                 getStringField(fields, "emailAddress"), getStringField(fields, "universityName"), getIntegerField(fields, "yearStudy"),
                 getStringField(fields, "fieldOfStudy"), getDoubleField(fields, "scholarshipAmount"));
     }

@@ -29,6 +29,7 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -39,10 +40,10 @@ import java.util.stream.Stream;
 
 @Service
 public class PersonService extends GenericService<Person, PersonRepository> {
-    @PersistenceContext
-    EntityManager entityManager;
     private final PersonFactory personFactory;
     private final Lock uploadLock = new ReentrantLock();
+    @PersistenceContext
+    EntityManager entityManager;
     private PersonRepository personRepository;
     private ImportProgressHolder importProgressHolder;
     private boolean isUploadInProgress = false;
@@ -70,8 +71,8 @@ public class PersonService extends GenericService<Person, PersonRepository> {
         Root<Person> root = query.from(Person.class);
         List<Predicate> predicates = new ArrayList<>();
         if (params.getType() != null) {
-            String type = params.getType().toUpperCase(Locale.ROOT);
-            predicates.add(builder.equal(root.get("type"), type));
+            String type = params.getType().toLowerCase(Locale.ROOT);
+            predicates.add(builder.equal(builder.lower(root.type().as(String.class)), type));
         }
         if (params.getFirstName() != null) {
             predicates.add(builder.like(builder.upper(root.get("firstName")), "%" + params.getFirstName().toUpperCase(Locale.ROOT) + "%"));
@@ -80,22 +81,13 @@ public class PersonService extends GenericService<Person, PersonRepository> {
         if (params.getLastName() != null) {
             predicates.add(builder.like(builder.upper(root.get("lastName")), "%" + params.getLastName().toUpperCase(Locale.ROOT) + "%"));
         }
-        if (params.getAgeFrom() != null) {
-            predicates.add(builder.greaterThanOrEqualTo(root.get("age"), params.getAgeFrom()));
-        }
-
-        if (params.getAgeTo() != null) {
-            predicates.add(builder.lessThanOrEqualTo(root.get("age"), params.getAgeTo()));
-        }
 
         if (params.getPesel() != null) {
             predicates.add(builder.equal(root.get("pesel"), params.getPesel()));
         }
-
-        if (params.getGender() != null) {
-            predicates.add(builder.equal(root.get("gender"), params.getGender()));
+        if (params.getHeight() != null) {
+            predicates.add(builder.equal(root.get("height"), params.getHeight()));
         }
-
         if (params.getHeightFrom() != null) {
             predicates.add(builder.greaterThanOrEqualTo(root.get("height"), params.getHeightFrom()));
         }
@@ -111,7 +103,9 @@ public class PersonService extends GenericService<Person, PersonRepository> {
         if (params.getWeightTo() != null) {
             predicates.add(builder.lessThanOrEqualTo(root.get("weight"), params.getWeightTo()));
         }
-
+        if (params.getWeight() != null) {
+            predicates.add(builder.equal(root.get("weight"), params.getWeight()));
+        }
         if (params.getEmailAddress() != null) {
             predicates.add(builder.like(builder.upper(root.get("emailAddress")), "%" + params.getEmailAddress().toUpperCase(Locale.ROOT) + "%"));
         }
@@ -178,6 +172,31 @@ public class PersonService extends GenericService<Person, PersonRepository> {
             query.where(predicates.toArray(new Predicate[predicates.size()]));
         }
         TypedQuery<Person> typedQuery = entityManager.createQuery(query);
+        if (params.getGender() != null) {
+            List<Person> filteredGenderPersons = typedQuery.getResultList()
+                    .stream()
+                    .filter(person -> {
+                        String pesel = person.getPesel();
+                        int genderNumber = Integer.parseInt(pesel.substring(9, 10));
+                        String gender = (genderNumber % 2 == 0) ? "Female" : "Male";
+                        return gender.equalsIgnoreCase(params.getGender());
+                    })
+                    .collect(Collectors.toList());
+            typedQuery = entityManager.createQuery(query.where(root.in(filteredGenderPersons)));
+
+        }
+        if (params.getAge() != null) {
+            List<Person> filteredAgePersons = typedQuery.getResultList()
+                    .stream()
+                    .filter(person -> {
+                        String pesel = person.getPesel();
+                        LocalDate birthDate = getBirthDateFromPesel(pesel);
+                        int age = Period.between(birthDate, LocalDate.now()).getYears();
+                        return age == params.getAge();
+                    })
+                    .collect(Collectors.toList());
+            typedQuery = entityManager.createQuery(query.where(root.in(filteredAgePersons)));
+        }
         typedQuery.setFirstResult(page * size);
         typedQuery.setMaxResults(size);
         List<PersonResponse> personList = typedQuery.getResultList().stream().map(personFactory::createResponse).collect(Collectors.toList());
@@ -191,13 +210,19 @@ public class PersonService extends GenericService<Person, PersonRepository> {
         if (personToEdit.getVersion() != personEditRequest.getVersion()) {
             throw new ModificationException("Person has been modified by another transaction. Please refresh and try again.");
         }
-        for (Map.Entry<String, Object> entry : personEditRequest.getUpdates().entrySet()) {
-            String fieldName = entry.getKey();
-            Object newValue = entry.getValue();
-            Field field = personToEdit.getClass().getDeclaredField(fieldName);
-            field.setAccessible(true);
-            field.set(personToEdit, newValue);
-        }
+
+        Class<?> currentClass = personToEdit.getClass();
+        do {
+            for (Field field : currentClass.getDeclaredFields()) {
+                String fieldName = field.getName();
+                if (personEditRequest.getUpdates().containsKey(fieldName)) {
+                    field.setAccessible(true);
+                    field.set(personToEdit, personEditRequest.getUpdates().get(fieldName));
+                }
+            }
+            currentClass = currentClass.getSuperclass();
+        } while (currentClass != null);
+
         personToEdit.setVersion(personToEdit.getVersion() + 1);
         personToEdit.setUpdatedAt(LocalDateTime.now());
         PersonResponse editedPerson = personFactory.createResponse(repository.saveAndFlush(personToEdit));
@@ -254,7 +279,6 @@ public class PersonService extends GenericService<Person, PersonRepository> {
         fields.put("firstName", args[1]);
         fields.put("lastName", args[2]);
         fields.put("pesel", args[3]);
-        fields.put("gender", args[4]);
         fields.put("height", Integer.parseInt(args[5]));
         fields.put("weight", Double.parseDouble(args[6]));
         fields.put("emailAddress", args[7]);
@@ -279,6 +303,24 @@ public class PersonService extends GenericService<Person, PersonRepository> {
         personRequest.setFields(fields);
 
         return personRequest;
+    }
+
+    private LocalDate getBirthDateFromPesel(String pesel) {
+        int year = Integer.parseInt(pesel.substring(0, 2));
+        int month = Integer.parseInt(pesel.substring(2, 4));
+        int day = Integer.parseInt(pesel.substring(4, 6));
+
+        if (month > 0 && month < 13) {
+            year += 1900;
+        } else if (month > 20 && month < 33) {
+            year += 2000;
+            month -= 20;
+        } else if (month > 40 && month < 53) {
+            year += 2100;
+            month -= 40;
+        }
+
+        return LocalDate.of(year, month, day);
     }
 
 }
