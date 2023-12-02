@@ -11,7 +11,7 @@ import java.util.Map;
 @ToString
 public class PersonRequest {
     @NotNull
-    @NotBlank
+    @NotBlank(message = "Type of person is required")
     private String typeOfPerson;
 
     private Map<String, Object> fields;

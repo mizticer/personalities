@@ -21,23 +21,22 @@ public class Employee extends Person {
     @NotBlank(message = "Last name is required")
     private String lastName;
     @Column(unique = true)
-    //@NotBlank(message = "PESEL is required")
+    @NotBlank(message = "PESEL is required")
+    @Size(min = 11, max = 11, message = "PESEL must be exactly 11 characters long")
+    @Pattern(regexp = "\\d+", message = "PESEL must consist only of digits")
     private String pesel;
-    @NotNull(message = "Gender is required")
+    @NotBlank(message = "Gender is required")
     private String gender;
     @Min(value = 0, message = "Height must be a positive number")
-    @NotNull(message = "Height is required")
     private Integer height;
     @DecimalMin(value = "0.0", message = "Weight must be a positive number")
     private Double weight;
     @Email(message = "Invalid email address")
     @NotBlank(message = "Email is required")
     private String emailAddress;
-
     private LocalDate currentEmploymentStartDate;
-
     private String currentPosition;
-
+    @PositiveOrZero(message = "Salary must be a non-negative number")
     private Double currentSalary;
     @OneToMany(mappedBy = "employee", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JsonManagedReference

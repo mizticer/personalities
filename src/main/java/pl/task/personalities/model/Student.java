@@ -17,12 +17,13 @@ public class Student extends Person {
     @NotBlank(message = "Last name is required")
     private String lastName;
     @Column(unique = true)
-    // @NotBlank(message = "PESEL is required")
+    @NotBlank(message = "PESEL is required")
+    @Size(min = 11, max = 11, message = "PESEL must be exactly 11 characters long")
+    @Pattern(regexp = "\\d+", message = "PESEL must consist only of digits")
     private String pesel;
-    @NotNull(message = "Gender is required")
+    @NotBlank(message = "Gender is required")
     private String gender;
     @Min(value = 0, message = "Height must be a positive number")
-    @NotNull(message = "Height is required")
     private Integer height;
     @DecimalMin(value = "0.0", message = "Weight must be a positive number")
     private Double weight;
@@ -31,7 +32,7 @@ public class Student extends Person {
     private String emailAddress;
     @NotBlank(message = "Current position is required")
     private String universityName;
-    @Min(value = 1, message = "Year of study must be a positive number")
+    @Min(value = 1, message = "Year of study must be minimum 1")
     private Integer yearStudy;
     @NotBlank(message = "Field of study is required")
     private String fieldOfStudy;

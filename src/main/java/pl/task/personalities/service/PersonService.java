@@ -1,17 +1,17 @@
 package pl.task.personalities.service;
 
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.LockModeType;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
-import org.springframework.data.jpa.repository.Lock;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import pl.task.personalities.common.components.ImportProgressHolder;
 import pl.task.personalities.common.creators.PersonFactory;
 import pl.task.personalities.exceptions.EntityNotFoundException;
 import pl.task.personalities.exceptions.ModificationException;
@@ -31,19 +31,28 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
 public class PersonService extends GenericService<Person, PersonRepository> {
-    private final PersonFactory personFactory;
-
     @PersistenceContext
     EntityManager entityManager;
+    private final PersonFactory personFactory;
+    private final Lock uploadLock = new ReentrantLock();
+    private PersonRepository personRepository;
+    private ImportProgressHolder importProgressHolder;
+    private boolean isUploadInProgress = false;
+    private UUID actualIdUploadProgress;
 
-    public PersonService(PersonRepository repository, PersonFactory personFactory) {
+    public PersonService(PersonRepository repository, PersonFactory personFactory, PersonRepository personRepository, ImportProgressHolder importProgressHolder) {
         super(repository);
         this.personFactory = personFactory;
+        this.personRepository = personRepository;
+        this.importProgressHolder = importProgressHolder;
     }
 
     @Transactional
@@ -195,16 +204,46 @@ public class PersonService extends GenericService<Person, PersonRepository> {
         return editedPerson;
     }
 
-    @Transactional
-    @Lock(value = LockModeType.PESSIMISTIC_WRITE)
+    public String addPersonFromCsv(MultipartFile file) {
+        if (isUploadInProgress) {
+            return "Upload is already in progress. Try again later. Check actual progress Check progress at /import-progress/" + actualIdUploadProgress;
+        }
+
+        uploadLock.lock();
+        try {
+            isUploadInProgress = true;
+            ImportProgress importProgress = importProgressHolder.createImportProgress();
+            importProgress.setStartDate(LocalDateTime.now());
+            CompletableFuture.runAsync(() -> {
+                try {
+                    processCsvFile(file, importProgress);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                } finally {
+                    uploadLock.unlock();
+                }
+            });
+            actualIdUploadProgress = UUID.fromString(importProgress.getId());
+            return "Import persons from csv started. Check progress at /import-progress/" + importProgress.getId();
+        } catch (Exception e) {
+            isUploadInProgress = false;
+            uploadLock.unlock();
+            throw e;
+        }
+    }
+
+    @Async
     public void processCsvFile(MultipartFile file, ImportProgress importProgress) throws IOException {
+
         Stream<String> lines = new BufferedReader(new InputStreamReader(file.getInputStream())).lines();
-        lines.map(line -> line.split(","))
+        lines.map(line -> line.split(";"))
                 .forEach(args -> {
                     PersonRequest personRequest = createPersonRequestFromCsv(args);
-                    addPerson(personRequest);
+                    personRepository.save(personFactory.createPerson(personRequest));
                     importProgress.incrementProcessedRows();
                 });
+        importProgress.setFinished(true);
+        importProgress.setEndDate(LocalDateTime.now());
     }
 
     private PersonRequest createPersonRequestFromCsv(String[] args) {
@@ -241,4 +280,5 @@ public class PersonService extends GenericService<Person, PersonRepository> {
 
         return personRequest;
     }
+
 }
