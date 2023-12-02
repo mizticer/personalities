@@ -261,7 +261,7 @@ public class PersonService extends GenericService<Person, PersonRepository> {
     public void processCsvFile(MultipartFile file, ImportProgress importProgress) throws IOException {
 
         Stream<String> lines = new BufferedReader(new InputStreamReader(file.getInputStream())).lines();
-        lines.map(line -> line.split(";"))
+        lines.map(line -> line.split(","))
                 .forEach(args -> {
                     PersonRequest personRequest = createPersonRequestFromCsv(args);
                     personRepository.save(personFactory.createPerson(personRequest));
@@ -279,22 +279,22 @@ public class PersonService extends GenericService<Person, PersonRepository> {
         fields.put("firstName", args[1]);
         fields.put("lastName", args[2]);
         fields.put("pesel", args[3]);
-        fields.put("height", Integer.parseInt(args[5]));
-        fields.put("weight", Double.parseDouble(args[6]));
-        fields.put("emailAddress", args[7]);
+        fields.put("height", Integer.parseInt(args[4]));
+        fields.put("weight", Double.parseDouble(args[5]));
+        fields.put("emailAddress", args[6]);
 
         switch (personRequest.getTypeOfPerson()) {
             case "EMPLOYEE":
                 break;
             case "PENSIONER":
-                fields.put("amountOfPension", Double.parseDouble(args[8]));
-                fields.put("yearsWorked", Integer.parseInt(args[9]));
+                fields.put("amountOfPension", Double.parseDouble(args[7]));
+                fields.put("yearsWorked", Integer.parseInt(args[8]));
                 break;
             case "STUDENT":
-                fields.put("universityName", args[8]);
-                fields.put("yearStudy", Integer.parseInt(args[9]));
-                fields.put("fieldOfStudy", args[10]);
-                fields.put("scholarshipAmount", Double.parseDouble(args[11]));
+                fields.put("universityName", args[7]);
+                fields.put("yearStudy", Integer.parseInt(args[8]));
+                fields.put("fieldOfStudy", args[9]);
+                fields.put("scholarshipAmount", Double.parseDouble(args[10]));
                 break;
             default:
                 throw new IllegalArgumentException("Invalid person type: " + personRequest.getTypeOfPerson());
