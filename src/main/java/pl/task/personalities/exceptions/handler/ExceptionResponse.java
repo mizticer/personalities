@@ -1,4 +1,4 @@
-package pl.task.personalities.exceptions;
+package pl.task.personalities.exceptions.handler;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 

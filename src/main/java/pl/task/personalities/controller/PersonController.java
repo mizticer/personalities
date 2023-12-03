@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import pl.task.personalities.common.components.ImportProgressHolder;
@@ -24,6 +25,7 @@ public class PersonController {
     private final ImportProgressHolder importProgressHolder;
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<PersonResponse>> getPersonByParameters(PersonQuery personQuery, @RequestParam(name = "page", defaultValue = "0") int page,
                                                                       @RequestParam(name = "size", defaultValue = "10") int size) {
         List<PersonResponse> personResponseList = personService.findPersonByParameters(personQuery, page, size);
