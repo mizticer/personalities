@@ -33,24 +33,28 @@ public class PersonController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<PersonResponse> createPerson(@RequestBody @Valid PersonRequest personRequest) {
         PersonResponse personResponse = personService.addPerson(personRequest);
         return new ResponseEntity<>(personResponse, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<PersonResponse> updatePerson(@PathVariable Long id, @RequestBody PersonEditRequest personEditRequest) throws NoSuchFieldException, IllegalAccessException {
         PersonResponse editedPerson = personService.edit(id, personEditRequest);
         return new ResponseEntity<>(editedPerson, HttpStatus.OK);
     }
 
     @PostMapping("/upload")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('IMPORTER')")
     public ResponseEntity<String> addPersonFromCsv(@RequestParam("file") MultipartFile file) {
         String response = personService.addPersonFromCsv(file);
         return new ResponseEntity<>(response, HttpStatus.ACCEPTED);
     }
 
     @GetMapping("/import-progress/{taskId}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('IMPORTER')")
     public ResponseEntity<ImportProgress> getImportProgress(@PathVariable String taskId) {
         ImportProgress importProgress = importProgressHolder.getImportProgress(taskId);
         return importProgress != null

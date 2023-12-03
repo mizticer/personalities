@@ -2,8 +2,6 @@ package pl.task.personalities.model.dto.request;
 
 import lombok.*;
 
-import java.time.LocalDate;
-
 @Data
 @Getter
 @Setter

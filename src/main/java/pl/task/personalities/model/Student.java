@@ -1,8 +1,9 @@
 package pl.task.personalities.model;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

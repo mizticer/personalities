@@ -68,11 +68,6 @@ public class PositionService {
         return positionResponse;
     }
 
-    @Transactional(readOnly = true)
-    public List<Position> findAll() {
-        return positionRepository.findAll();
-    }
-
     private void validatePositionDates(List<Position> existingPositions, PositionRequest newPosition) {
         LocalDate newStartDate = newPosition.getStartDate();
         LocalDate newEndDate = newPosition.getEndDate();

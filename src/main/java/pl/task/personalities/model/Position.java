@@ -36,7 +36,7 @@ public class Position {
         this.endDate = endDate;
         this.salary = salary;
         this.employee.getPositions().add(this);
-        if(endDate==null) {
+        if (endDate == null) {
             this.employee.setCurrentPosition(name);
             this.employee.setCurrentEmploymentStartDate(startDate);
             this.employee.setCurrentSalary(salary);
