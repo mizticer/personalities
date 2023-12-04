@@ -67,7 +67,6 @@ public class WebSecurityConfig {
                                 .requestMatchers(mvcMatcherBuilder.pattern(PERSON_URL)).permitAll()
                                 .requestMatchers(mvcMatcherBuilder.pattern(AUTH_URL)).permitAll()
                                 .requestMatchers(PathRequest.toH2Console()).authenticated()
-                                .requestMatchers(PathRequest.toH2Console()).permitAll()
                                 //.dispatcherTypeMatchers(DispatcherType.ASYNC).permitAll()
                                 .anyRequest().authenticated()
                 );
