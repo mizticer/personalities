@@ -1,10 +1,7 @@
 package pl.task.personalities.model;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,6 +15,7 @@ import java.util.List;
 @Setter
 @Entity
 @NoArgsConstructor
+@DiscriminatorValue("Employee")
 public class Employee extends Person {
     private LocalDate currentEmploymentStartDate;
     private String currentPosition;
@@ -27,8 +25,8 @@ public class Employee extends Person {
     @JsonManagedReference
     private List<Position> positions = new ArrayList<>();
 
-    public Employee(String firstName, String lastName, String pesel, Integer height, Double weight, String emailAddress) {
-        super(firstName, lastName, pesel, height, weight, emailAddress);
+    public Employee(String typeOfPerson, String firstName, String lastName, String pesel, Integer height, Double weight, String emailAddress) {
+        super(typeOfPerson, firstName, lastName, pesel, height, weight, emailAddress);
     }
 
 }

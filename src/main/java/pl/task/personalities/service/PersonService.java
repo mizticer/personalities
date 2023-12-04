@@ -7,6 +7,7 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
+import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,22 +40,16 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
-public class PersonService extends GenericService<Person, PersonRepository> {
+@RequiredArgsConstructor
+public class PersonService {
+    private final PersonRepository repository;
     private final PersonFactory personFactory;
     private final Lock uploadLock = new ReentrantLock();
+    private final ImportProgressHolder importProgressHolder;
     @PersistenceContext
     EntityManager entityManager;
-    private PersonRepository personRepository;
-    private ImportProgressHolder importProgressHolder;
     private boolean isUploadInProgress = false;
     private UUID actualIdUploadProgress;
-
-    public PersonService(PersonRepository repository, PersonFactory personFactory, PersonRepository personRepository, ImportProgressHolder importProgressHolder) {
-        super(repository);
-        this.personFactory = personFactory;
-        this.personRepository = personRepository;
-        this.importProgressHolder = importProgressHolder;
-    }
 
     @Transactional
     public PersonResponse addPerson(PersonRequest personRequest) {
@@ -65,14 +60,14 @@ public class PersonService extends GenericService<Person, PersonRepository> {
         return personResponse;
     }
 
+    @Transactional(readOnly = true)
     public List<PersonResponse> findPersonByParameters(PersonQuery params, int page, int size) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Person> query = builder.createQuery(Person.class);
         Root<Person> root = query.from(Person.class);
         List<Predicate> predicates = new ArrayList<>();
         if (params.getType() != null) {
-            String type = params.getType().toLowerCase(Locale.ROOT);
-            predicates.add(builder.equal(builder.lower(root.type().as(String.class)), type));
+            predicates.add(builder.like(builder.upper(root.get("typeOfPerson")), "%" + params.getType().toUpperCase(Locale.ROOT) + "%"));
         }
         if (params.getFirstName() != null) {
             predicates.add(builder.like(builder.upper(root.get("firstName")), "%" + params.getFirstName().toUpperCase(Locale.ROOT) + "%"));
@@ -85,9 +80,11 @@ public class PersonService extends GenericService<Person, PersonRepository> {
         if (params.getPesel() != null) {
             predicates.add(builder.equal(root.get("pesel"), params.getPesel()));
         }
+
         if (params.getHeight() != null) {
             predicates.add(builder.equal(root.get("height"), params.getHeight()));
         }
+
         if (params.getHeightFrom() != null) {
             predicates.add(builder.greaterThanOrEqualTo(root.get("height"), params.getHeightFrom()));
         }
@@ -103,12 +100,15 @@ public class PersonService extends GenericService<Person, PersonRepository> {
         if (params.getWeightTo() != null) {
             predicates.add(builder.lessThanOrEqualTo(root.get("weight"), params.getWeightTo()));
         }
+
         if (params.getWeight() != null) {
             predicates.add(builder.equal(root.get("weight"), params.getWeight()));
         }
+
         if (params.getEmailAddress() != null) {
             predicates.add(builder.like(builder.upper(root.get("emailAddress")), "%" + params.getEmailAddress().toUpperCase(Locale.ROOT) + "%"));
         }
+
         if (params.getSalaryFrom() != null) {
             predicates.add(builder.greaterThanOrEqualTo(root.get("currentSalary"), params.getSalaryFrom()));
         }
@@ -134,6 +134,7 @@ public class PersonService extends GenericService<Person, PersonRepository> {
         if (params.getPosition() != null) {
             predicates.add(builder.like(builder.upper(root.get("currentPosition")), "%" + params.getPosition().toUpperCase(Locale.ROOT) + "%"));
         }
+
         if (params.getUniversityName() != null) {
             predicates.add(builder.like(builder.upper(root.get("universityName")), "%" + params.getUniversityName().toUpperCase(Locale.ROOT) + "%"));
         }
@@ -264,7 +265,7 @@ public class PersonService extends GenericService<Person, PersonRepository> {
         lines.map(line -> line.split(","))
                 .forEach(args -> {
                     PersonRequest personRequest = createPersonRequestFromCsv(args);
-                    personRepository.save(personFactory.createPerson(personRequest));
+                    repository.save(personFactory.createPerson(personRequest));
                     importProgress.incrementProcessedRows();
                 });
         importProgress.setFinished(true);

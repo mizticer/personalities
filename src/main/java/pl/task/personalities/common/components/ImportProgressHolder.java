@@ -22,7 +22,4 @@ public class ImportProgressHolder {
         return importProgressMap.get(taskId);
     }
 
-    public void removeImportProgress(String taskId) {
-        importProgressMap.remove(taskId);
-    }
 }

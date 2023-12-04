@@ -16,13 +16,15 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @Setter
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 @NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 public abstract class Person implements Serializable, Identification {
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE)
     private Long id;
+    @NotBlank(message = "Type of person is required")
+    private String typeOfPerson;
     @CreatedDate
     private LocalDateTime createdAt;
     @LastModifiedDate
@@ -46,7 +48,8 @@ public abstract class Person implements Serializable, Identification {
     @NotBlank(message = "Email is required")
     private String emailAddress;
 
-    public Person(String firstName, String lastName, String pesel, Integer height, Double weight, String emailAddress) {
+    public Person(String typeOfPerson, String firstName, String lastName, String pesel, Integer height, Double weight, String emailAddress) {
+        this.typeOfPerson = typeOfPerson;
         this.firstName = firstName;
         this.lastName = lastName;
         this.pesel = pesel;

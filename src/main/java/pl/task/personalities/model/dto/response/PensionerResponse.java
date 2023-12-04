@@ -26,6 +26,4 @@ public class PensionerResponse implements PersonResponse {
     private String emailAddress;
     private Double amountOfPension;
     private Integer yearsWorked;
-
-
 }

@@ -22,8 +22,8 @@ public class Student extends Person {
     @DecimalMin(value = "0.0", message = "Scholarship amount must be a positive number")
     private Double scholarshipAmount;
 
-    public Student(String firstName, String lastName, String pesel, Integer height, Double weight, String emailAddress, String universityName, Integer yearStudy, String fieldOfStudy, Double scholarshipAmount) {
-        super(firstName, lastName, pesel, height, weight, emailAddress);
+    public Student(String typeOfPerson, String firstName, String lastName, String pesel, Integer height, Double weight, String emailAddress, String universityName, Integer yearStudy, String fieldOfStudy, Double scholarshipAmount) {
+        super(typeOfPerson, firstName, lastName, pesel, height, weight, emailAddress);
         this.universityName = universityName;
         this.yearStudy = yearStudy;
         this.fieldOfStudy = fieldOfStudy;

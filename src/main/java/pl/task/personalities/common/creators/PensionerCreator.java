@@ -22,7 +22,7 @@ public class PensionerCreator implements PersonCreator {
 
     @Override
     public Person create(Map<String, Object> fields) {
-        return new Pensioner(getStringField(fields, "firstName"), getStringField(fields, "lastName"), getStringField(fields, "pesel"),
+        return new Pensioner("Pensioner", getStringField(fields, "firstName"), getStringField(fields, "lastName"), getStringField(fields, "pesel"),
                 getIntegerField(fields, "height"), getDoubleField(fields, "weight"), getStringField(fields, "emailAddress"), getDoubleField(fields, "amountOfPension"), getIntegerField(fields, "yearsWorked"));
     }
 

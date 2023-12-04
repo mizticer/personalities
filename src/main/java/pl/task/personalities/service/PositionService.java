@@ -37,9 +37,12 @@ public class PositionService {
         return positionResponse;
     }
 
+    @Transactional
     public PositionResponse editPosition(Long positionId, PositionRequest positionRequest) {
         Position positionToEdit = positionRepository.findById(positionId)
                 .orElseThrow(() -> new EntityNotFoundException("Position not found"));
+
+        Employee employee = positionToEdit.getEmployee();
 
         validateEditPositionDates(positionToEdit.getEmployee().getPositions(), positionRequest);
         boolean wasCurrentPosition = positionToEdit.getEndDate() == null;
@@ -51,11 +54,19 @@ public class PositionService {
         Position editedPosition = positionRepository.saveAndFlush(positionToEdit);
 
         if (wasCurrentPosition && (positionRequest.getEndDate() != null || editedPosition.getEndDate() != null)) {
-            Employee employee = positionToEdit.getEmployee();
             employee.setCurrentPosition(null);
             employee.setCurrentEmploymentStartDate(null);
             employee.setCurrentSalary(null);
             personRepository.saveAndFlush(employee);
+        }
+
+        if (positionRequest.getEndDate() == null && employee.getCurrentPosition() == null) {
+            employee.setCurrentPosition(positionRequest.getName());
+            employee.setCurrentEmploymentStartDate(positionRequest.getStartDate());
+            employee.setCurrentSalary(positionRequest.getSalary());
+            personRepository.saveAndFlush(employee);
+        } else {
+            throw new PositionDateException("Edited position overlaps with existing current position");
         }
 
         PositionResponse positionResponse = PositionResponse.builder()

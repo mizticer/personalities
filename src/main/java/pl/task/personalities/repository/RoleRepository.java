@@ -7,7 +7,8 @@ import pl.task.personalities.model.security.ERole;
 import pl.task.personalities.model.security.Role;
 
 import java.util.Optional;
+
 @Repository
 public interface RoleRepository extends JpaRepository<Role, Long> {
-  Optional<Role> findByName(ERole name);
+    Optional<Role> findByName(ERole name);
 }
