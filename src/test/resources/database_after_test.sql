@@ -18,5 +18,3 @@ FROM users;
 
 DELETE
 FROM roles;
-
-ó

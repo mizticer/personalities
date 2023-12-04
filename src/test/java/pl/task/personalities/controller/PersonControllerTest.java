@@ -124,6 +124,20 @@ class PersonControllerTest {
     }
 
     @Test
+    @DisplayName("Should return a person with gender Male and 24 age(Information in PESEL)")
+    void find_shouldReturnPersonWith24AgeAndGenderMale() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/persons?age=24&gender=Male")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].id").value(5))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].firstName").value("Andrew"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].lastName").value("Smith"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].height").value(170))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].weight").value(75.0))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].emailAddress").value("andrew.smith@example.com"));
+    }
+
+    @Test
     @DisplayName("Should succesfully save new person with specified details")
     void save_shouldInsertNewPerson_whenSavingValidPerson() throws Exception {
         PersonRequest personRequest = new PersonRequest();

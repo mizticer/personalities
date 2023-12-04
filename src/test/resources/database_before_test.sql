@@ -12,10 +12,10 @@ INSERT INTO Pensioner (id, created_at, updated_at, version, type_of_person, firs
                        email_address, amount_of_pension, years_worked)
 VALUES (3, '2023-12-03 23:58:56.147539', '2023-12-03 23:58:56.147539', 0, 'Pensioner', 'Sylwek', 'Doe', '99022401765',
         190, 95.5, 'Sylwek.doe@example.com', 2300.0, 5),
-       (4, '2023-12-03 23:58:56.147539', '2023-12-03 23:58:56.147539', 0, 'Pensioner', 'John', 'Doe', '99022401234',
+       (4, '2023-12-03 23:58:56.147539', '2023-12-03 23:58:56.147539', 0, 'Pensioner', 'John', 'Doe', '99022401264',
         180, 85.5, 'john.doe@example.com', 2000.0, 10),
-       (5, '2023-12-03 23:58:56.147539', '2023-12-03 23:58:56.147539', 0, 'Pensioner', 'Anna', 'Smith', '99022401111',
-        170, 75.0, 'anna.smith@example.com', 1800.0, 8);
+       (5, '2023-12-03 23:58:56.147539', '2023-12-03 23:58:56.147539', 0, 'Pensioner', 'Andrew', 'Smith', '99022401751',
+        170, 75.0, 'andrew.smith@example.com', 1800.0, 8);
 
 INSERT INTO Student (id, created_at, updated_at, version, type_of_person, first_name, last_name, pesel, height, weight,
                      email_address, university_name, year_study, field_of_study, scholarship_amount)
